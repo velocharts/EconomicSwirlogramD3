@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Manufacturing PMI Path</title>
+        <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    </head>
+	<style>	
+#dropDown {
+	font-size: 13px;
+   font-family: Helvetica, Arial, Sans-Serif;
+   color: rgb(80,80,80);
+   }
+ 	
+			.axis path,
+			.axis line {
+				fill: none;
+				stroke: grey;
+				shape-rendering: crispEdges;
+				
+			}
+			
+			.axis text {
+				font-family: sans-serif;
+				font-size: 13px;
+				fill: rgb(80,80,80);
+			}
+				
+		a, img {
+    border:none;
+}
+
+h1 {
+	font-family: "AdelleSansWeb", Helvetica, Arial, "MS Trebuchet", sans-serif;
+	margin: 0px;
+	padding: 0px;
+}
+
+h1 {
+	font-size: 32px;
+	line-height: 42px;
+	color: rgb(80,80,80);
+}
+</style>
+
+    <body>
+	<h1>Manufacturing PMI Path Over Last 3 Years</h1>
+	<br>
+	<form id="dropDown">
+Select Country:
+<select id="country">
+<option>US</option>
+<option>UK</option>
+<option>Japan</option>
+<option>Eurozone</option>
+<option>Germany</option>
+<option>France</option>
+<option>Italy</option>
+<option>China</option>
+<option>Spain</option>
+<option>Greece</option>
+<option>Korea</option>
+<option>India</option>
+<option>Brazil</option>
+<option>Indonesia</option>
+<option>Poland</option>
+<option>Mexico</option>
+<option>Czech Republic</option>
+<option>Taiwan</option>
+<option>Turkey</option>
+<option>Australia</option>
+<option>Canada</option>
+
+  
+</select>
+<br>
+        <script type="text/javascript">
+
+		
+	
+		
+//Size the graphic		
+		   	var w = 700;
+			var h = 650;
+//Circle size
+			var c = 6;
+// Padding arounf edge of chart			
+			var padding = 50;
+//Load in data
+		d3.csv("http://dl.dropboxusercontent.com/u/17797293/d3_PMI/d3_PMI.csv", function(error, data) {;
+		data.forEach(function(d) {
+			d.uslevel = +d.uslevel;
+			d.uschange = +d.uschange;
+		/*	d.uklevel = +d.uklevel;
+			d.ukchange = +d.ukchange;
+			d.chlevel = +d.chlevel;
+			d.chchange = +d.chchange;		*/
+	});
+//scales
+			var yScale = d3.scale.linear()
+              // Scale based on max min .domain([d3.min(data, function(d) { return d.uklevel; }), d3.max(data, function(d) { return d.uklevel; })])
+				 .domain([42, 58])
+				 .range([h - padding, padding]);	
+				
+			var xScale = d3.scale.linear()
+              // Scale based on max min  .domain([d3.min(data, function(d) { return d.ukchange; }), d3.max(data, function(d) { return d.ukchange; })])
+                .domain([-4, 4])
+				.range([padding, w - padding]);
+				 //Define X axis
+			var xAxis = d3.svg.axis()
+							  .scale(xScale)
+							  .orient("top")
+							  .ticks(10);
+
+			//Define Y axis
+			var yAxis = d3.svg.axis()
+							  .scale(yScale)
+							  .orient("left")
+							  .ticks(10);
+	
+//Create SVG element
+			var svg = d3.select("body")
+				.append("svg")
+				.attr("width", w)
+				.attr("height", h);
+			
+				
+//Create Squares
+			var rectangleTL = svg.append("rect")
+                .attr("x", padding)
+                .attr("y", padding)
+				.attr("fill", "rgb(255, 255, 229)")
+                .attr("width", (w - (2 * padding)) / 2)
+                .attr("height",(h - (2 * padding)) /2);	
+			var rectangleTR = svg.append("rect")
+                .attr("x", w / 2)
+                .attr("y", padding)
+				.attr("fill", "rgb(255, 247, 188)")
+                .attr("width", (w - (2 * padding)) / 2)
+                .attr("height",(h - (2 * padding)) /2);		
+			var rectangleBR = svg.append("rect")
+                .attr("x", w / 2)
+                .attr("y", h / 2)
+				.attr("fill", "rgb(255, 255, 229)")
+                .attr("width", (w - (2 * padding)) / 2)
+                .attr("height",(h - (2 * padding)) /2);		
+			var rectangleBL = svg.append("rect")
+                .attr("x", padding)
+                .attr("y", h / 2)
+				.attr("fill", "rgb(255, 247, 188)")
+                .attr("width", (w - (2 * padding)) / 2)
+                .attr("height",(h - (2 * padding)) /2);					
+
+				//Set up labels						   	   
+		var labels = svg.selectAll("text")
+			   .data(data)
+			   .enter()
+			   .append("text")
+			   .text(function(d) {
+			   		return d.Date;
+			   })
+			   .attr("x", function(d) {
+			   		return xScale(d.uschange);
+			   })
+			   .attr("y", function(d) {
+			   		return  yScale(d.uslevel);
+			   })
+			   .attr("font-family", "sans-serif")
+			   .attr("font-size", "11px")
+			   .attr("fill", "grey");	
+			
+//Create X axis
+			svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + (padding) + ")")
+				.call(xAxis);
+			
+//Create Y axis
+			svg.append("g")
+				.attr("class", "y axis")
+				.attr("transform", "translate(" + padding + ",0)")
+				.call(yAxis);		
+				
+	svg.append("text")
+	.attr("x", ((w - padding * 2) * 0.75) + padding )
+	.attr("text-anchor", "middle")
+    .attr("y", padding + 17)
+	.attr("font-family", "sans-serif")
+	.attr("fill", "rgb(90,90,90)")
+    .text("Positive & Accelerating");
+
+	svg.append("text")
+	.attr("x", ((w - padding * 2) * 0.25) + padding )
+	.attr("text-anchor", "middle")
+    .attr("y", h - padding - 5)
+	.attr("font-family", "sans-serif")
+	.attr("fill", "rgb(90,90,90)")
+    .text("Negative & Decelerating");	
+
+	svg.append("text")
+	.attr("x", ((w - padding * 2) * 0.25) + padding )
+	.attr("text-anchor", "middle")
+    .attr("y", padding + 17)
+	.attr("font-family", "sans-serif")
+	.attr("fill", "rgb(90,90,90)")
+    .text("Positive & Decelerating");
+	
+	svg.append("text")
+	.attr("x", ((w - padding * 2) * 0.75) + padding )
+	.attr("text-anchor", "middle")
+      .attr("y", h - padding - 5)
+	.attr("font-family", "sans-serif")
+	.attr("fill", "rgb(90,90,90)")
+    .text("Negative & Accelerating");
+			
+	svg.append("text")
+    .attr("class", "x label")
+    	.attr("text-anchor", "end")
+    .attr("x", w - padding)
+    .attr("y", 15)
+	.attr("font-family", "sans-serif")
+	.attr("fill", "rgb(90,90,90)")
+    .text("Monthly Change in PMI");	
+	
+	svg.append("text")
+    .attr("class", "x label")
+    	.attr("text-anchor", "end")
+    .attr("x", w - padding)
+    .attr("y", h - padding / 2)
+	.attr("font-family", "sans-serif")
+	.attr("font-size", 10)
+	.attr("fill", "rgb(90,90,90)")
+    .text("Sources: Thomson Reuters Datastream, Markit, ISM");	
+
+	svg.append("text")
+    .attr("class", "x label")
+    	.attr("text-anchor", "start")
+    .attr("x", padding)
+    .attr("y", h - padding / 2)
+	.attr("font-family", "sans-serif")
+	.attr("font-size", 10)
+	.attr("fill", "rgb(90,90,90)")
+    .text("Click on the chart to redraw the path");	
+	
+	svg.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+	.attr("font-family", "sans-serif")
+	.attr("fill", "rgb(90,90,90)")
+    .attr("y", 3)
+	.attr("x", - padding)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("PMI Level");
+
+//Cerate the line path			   
+			var line = d3.svg.line()
+				.interpolate("cardinal")
+				.x(function(d) {return xScale(d.uschange);})
+				.y(function(d) {return  yScale(d.uslevel);})
+			   
+			var path = svg.append("path")
+				.attr("d", line(data))
+				.attr("stroke", "steelblue")
+				.attr("stroke-width", "2.5")
+				.attr("fill", "none");		
+				
+			 var totalLength = path.node().getTotalLength();
+// Add the line path			
+			path
+				.attr("stroke-dasharray", totalLength + " " + totalLength)
+				.attr("stroke-dashoffset", totalLength)
+				.transition()
+				.delay(1000)
+				.duration(2500)
+        .ease("linear")
+        .attr("stroke-dashoffset", 0);	
+
+
+		svg.on("click", function(){
+	
+      path    
+	.attr("stroke-dasharray", totalLength + " " + totalLength)
+				.attr("stroke-dashoffset", totalLength)	  
+        .transition()
+        .duration(3000)
+        .ease("linear")
+        .attr("stroke-dashoffset", 0)
+		
+    });
+
+	//Set up circles
+var totalLengthS = data.length;
+
+			svg.selectAll("circle")
+			   .data(data)
+			   .enter()
+			   .append("circle")
+			 //.attr("fill", "steelblue")
+
+			 
+			 .attr("fill", function(d,i) {
+		
+				 if (i == totalLengthS - 1) { return "rgb(227,27,35)" }
+				 else if (i == 0) { return "rgb(0,154,61)" }
+						  else {  return "steelblue" }
+						  			  })
+			 			 
+			.attr("stroke", "white")
+			.attr("stroke-width", "1.5")
+			   .attr("cx", function(d) {
+			   		return xScale(d.uschange);
+			   })
+			   .attr("cy", function(d) {
+			   		return yScale(d.uslevel);
+			   })
+// Do we want to size circle here?			   
+			   .attr("r", function(d) {
+			   //		return Math.sqrt(h - d[1]);
+			   return c;
+			   });
+
+//set up tool tips	
+			var tips = svg.selectAll("circle")	
+				.append("title")
+				.text(function(d) {
+				return d.Date + " | Level: " + d.uklevel + " | Change: " + d.ukchange;});			   
+			   
+			   
+	//Country dropdown			   
+			   d3.select("#country")
+				.on("change", function() {
+			var country=document.getElementById("country");
+			var countryS=country.options[country.selectedIndex].text
+		
+switch (countryS)
+{
+case "US" : 
+  
+     data.forEach(function(d) {
+    d.change = d.uschange;
+	d.level = d.uslevel;
+	
+	});
+     break;
+
+  case "UK" : 
+  
+     data.forEach(function(d) {
+    d.change = +d.ukchange;
+	d.level = +d.uklevel;
+	
+	});
+     break;
+case "China" : 
+    data.forEach(function(d) {
+    d.change = +d.chchange;
+	d.level = +d.chlevel;
+	
+	});
+	break;
+	
+	case "France" : 
+    data.forEach(function(d) {
+    d.change = +d.frchange;
+	d.level = +d.frlevel;
+	
+	});
+	break;
+	
+		case "Germany" : 
+    data.forEach(function(d) {
+    d.change = +d.dechange;
+	d.level = +d.delevel;
+	
+	});
+	break;
+	
+		case "Italy" : 
+    data.forEach(function(d) {
+    d.change = +d.itchange;
+	d.level = +d.itlevel;
+	
+	});
+	break;
+	
+			case "Spain" : 
+    data.forEach(function(d) {
+    d.change = +d.eschange;
+	d.level = +d.eslevel;
+	
+	});
+	break;
+	
+			case "Greece" : 
+    data.forEach(function(d) {
+    d.change = +d.grchange;
+	d.level = +d.grlevel;
+	
+	});
+	break;
+	
+			case "Australia" : 
+    data.forEach(function(d) {
+    d.change = +d.auchange;
+	d.level = +d.aulevel;
+	
+	});
+	break;
+	
+			case "Korea" : 
+    data.forEach(function(d) {
+    d.change = +d.kochange;
+	d.level = +d.kolevel;
+	
+	});
+	break;
+	
+			case "Canada" : 
+    data.forEach(function(d) {
+    d.change = +d.cnchange;
+	d.level = +d.cnlevel;
+	
+	});
+	break;
+	
+			case "Japan" : 
+    data.forEach(function(d) {
+    d.change = +d.jpchange;
+	d.level = +d.jplevel;
+	
+	});
+	break;
+	
+			case "India" : 
+    data.forEach(function(d) {
+    d.change = +d.inchange;
+	d.level = +d.inlevel;
+	
+	});
+	break;
+	
+			case "Eurozone" : 
+    data.forEach(function(d) {
+    d.change = +d.emchange;
+	d.level = +d.emlevel;
+	
+	});
+	break;
+	
+			case "Brazil" : 
+    data.forEach(function(d) {
+    d.change = +d.brchange;
+	d.level = +d.brlevel;
+	
+	});
+	break;
+	
+			case "Indonesia" : 
+    data.forEach(function(d) {
+    d.change = +d.idchange;
+	d.level = +d.idlevel;
+	
+	});
+	break;
+	
+			case "Poland" : 
+    data.forEach(function(d) {
+    d.change = +d.itchange;
+	d.level = +d.itlevel;
+	
+	});
+	break;
+	
+			case "Mexico" : 
+    data.forEach(function(d) {
+    d.change = +d.mxchange;
+	d.level = +d.mxlevel;
+	
+	});
+	break;
+	
+			case "Czech Republic" : 
+    data.forEach(function(d) {
+    d.change = +d.czchange;
+	d.level = +d.czlevel;
+	
+	});
+	break;
+	
+			case "Taiwan" : 
+    data.forEach(function(d) {
+    d.change = +d.twchange;
+	d.level = +d.twlevel;
+	
+	});
+	break;
+	
+			case "Turkey" : 
+    data.forEach(function(d) {
+    d.change = +d.tkchange;
+	d.level = +d.tklevel;
+	
+	});
+	break;
+	
+	}
+
+	
+			
+	
+	
+// remove the old line path				
+	
+		svg.selectAll("path").remove();
+
+//2 Create the new line path			   
+			var line = d3.svg.line()
+				.interpolate("cardinal")
+				.x(function(d) {return xScale(d.change);})
+				.y(function(d) {return  yScale(d.level);})
+			   
+			var path = svg.append("path")
+				.attr("d", line(data))
+				.attr("stroke", "steelblue")
+				.attr("stroke-width", "2.5")
+				.attr("fill", "none");		
+				
+			 var totalLength = path.node().getTotalLength();
+//2 Add the line path			
+			path
+				.attr("stroke-dasharray", totalLength + " " + totalLength)
+				.attr("stroke-dashoffset", totalLength)
+				.transition()
+				.delay(1000)
+				.duration(2500)
+        .ease("linear")
+        .attr("stroke-dashoffset", 0);	
+svg.on("click", function(){
+	
+      path    
+	.attr("stroke-dasharray", totalLength + " " + totalLength)
+				.attr("stroke-dashoffset", totalLength)	  
+        .transition()
+        .duration(3000)
+        .ease("linear")
+        .attr("stroke-dashoffset", 0)
+		
+    });
+
+//Transition circles	
+
+	var circ = svg.selectAll("circle")
+			   .data(data)
+			    .transition()
+			    .duration(1000)
+				.attr("cx", function(d) {
+			   		return xScale(d.change);})
+			   .attr("cy", function(d) {
+			   		return yScale(d.level);})
+
+//Transition tool tips	
+tips.text(function(d) {
+				return d.Date + " | Level: " + d.level + " | Change: " + d.change;});
+
+	
+				//Transition text
+labels
+			   .data(data)
+			    .transition()
+			    .duration(1000)
+ .attr("x", function(d) {
+			   		return xScale(d.change);
+			   })
+			   .attr("y", function(d) {
+			   		return  yScale(d.level);
+			   })
+
+	
+		}); 
+			   
+});  
+		   
+   
+        </script>
+    </body>
+</html>
